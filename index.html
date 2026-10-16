@@ -108,6 +108,11 @@ h2{font-size:15px;margin:0 0 12px}h2 span{font-weight:400;color:var(--sub);font-
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}.lr{display:flex;justify-content:space-between;font-size:12px;padding:6px 0}
 .dl{width:100%;margin-top:10px;padding:10px;border:1px solid var(--main);background:transparent;color:var(--main);border-radius:8px;font:inherit;cursor:pointer}
 .goal{width:84px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 6px;font:inherit;font-size:11px}
+#lock{position:fixed;inset:0;z-index:100;background:#0d1524;color:#e6edf7;display:grid;place-items:center;padding:20px}#lock[hidden]{display:none}
+.lockbox{width:min(320px,100%);text-align:center;display:grid;gap:12px}.lockbox h1{margin:0;font-size:16px}
+#pin{font:inherit;font-size:22px;letter-spacing:.4em;text-align:center;padding:12px;border-radius:10px;border:1px solid #243149;background:#131d31;color:#e6edf7}
+#pinbtn{font:inherit;padding:12px;border:0;border-radius:10px;background:#35d0a0;color:#0d1524;font-weight:700;cursor:pointer}#pinbtn:disabled{opacity:.5}
+#lockmsg{min-height:1.4em;font-size:12px;color:#f2a03d}
 </style>
 </head>
 <body>
@@ -214,6 +219,7 @@ h2{font-size:15px;margin:0 0 12px}h2 span{font-weight:400;color:var(--sub);font-
 <div class='card'><h2>今月の経費カテゴリ TOP5</h2><div style='display:flex;gap:14px;align-items:center;flex-wrap:wrap'><svg id='lcat' viewBox='0 0 120 120' width='120' height='120'></svg><div id='lcatl' style='flex:1;min-width:140px'></div></div></div></div>
 <div class='card ai2' style='margin-top:14px'><h2>AIからの今月のアドバイス <span>β</span></h2><div class='grid a3' id='lai'></div></div>
 </div>
+<div id='lock' hidden><div class='lockbox'><div style='font-size:34px'>⛰️</div><h1>つぐも 事業管理ダッシュボード</h1><input id='pin' type='password' inputmode='numeric' autocomplete='current-password' placeholder='パスコード' aria-label='パスコード'><button id='pinbtn'>入る</button><div id='lockmsg' role='alert'></div></div></div>
 <div id='toast' class='toast' role='status'></div>
 </main>
 </div>
@@ -483,8 +489,26 @@ async function pullSync(){if(!SYNC)return;let changed=false;
   else if((!r||r.t<lt)&&localStorage.getItem(k)!==null){const t=lt||Date.now();localStorage.setItem('ts:'+k,t);await SYNC.col.doc(k).set({v:localStorage.getItem(k),t})}
  }catch(e){}}
  if(changed)rerender()}
+/* ===== Vercel で動かすとき: パスコード画面 + 自分のサーバー(/api)経由の同期 =====
+   claude.ai の中では使わない（claude.use があるときは上の db 同期を使う）。 */
+let LOCKST=null;
+function showLock(msg){$('lock').hidden=false;$('lockmsg').textContent=msg||'';setTimeout(()=>$('pin').focus(),50)}
+function startVercelSync(){SYNC={col:{doc:k=>({
+ get:async()=>{const r=await fetch('/api/data?k='+encodeURIComponent(k),{cache:'no-store'});if(r.status===401){showLock();throw new Error('auth')}const j=await r.json();return {exists:j.exists,data:()=>j.data}},
+ set:async d=>{const r=await fetch('/api/data',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({k,d})});if(r.status===401){showLock();throw new Error('auth')}if(!r.ok)throw new Error('put')}})}};
+ return pullSync().then(()=>{if(LOCKST)LOCKST('☁ 同期オン')})}
+async function vercelGate(st){LOCKST=st;$('lock').hidden=false;$('lockmsg').textContent='確認中…';
+ try{const r=await fetch('/api/session',{cache:'no-store'});if(r.status===401){showLock('');return}
+  $('lock').hidden=true;if(r.ok)await startVercelSync()}catch(e){$('lock').hidden=true}}
+async function tryLogin(){const pin=$('pin').value;if(!pin)return;$('pinbtn').disabled=true;
+ try{const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin})}),j=await r.json().catch(()=>({}));
+  if(r.ok){$('pin').value='';$('lock').hidden=true;await startVercelSync();$('pinbtn').disabled=false;return}
+  $('lockmsg').textContent=r.status===429?`続けて間違えたため、約${j.wait||15}分お待ちください。`:r.status===401?`番号が違います（あと${j.left}回）`:'うまくつながりません。設定を確認してください。';$('pin').value=''}
+ catch(e){$('lockmsg').textContent='通信できません。もう一度試してください。'}
+ $('pinbtn').disabled=false}
+$('pinbtn').addEventListener('click',tryLogin);$('pin').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing)tryLogin()});
 (async()=>{const st=t=>{$('syncst').textContent=t};st('この端末のみ保存');
- try{if(typeof claude==='undefined'||!claude.use)return;const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db||!user)return;
+ try{if(typeof claude==='undefined'||!claude.use){await vercelGate(st);return}const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db||!user)return;
   const uid=await user.id();if(!uid)return;SYNC={col:db.collection('data/users/'+uid)};await pullSync();st('☁ 同期オン');toast('☁ 同期オン')}catch(e){}})();
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pullSync()});
 </script>
