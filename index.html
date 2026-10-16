@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>つぐも 事業管理ダッシュボード</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⛰️</text></svg>">
+<style>
+:root{--bg:#f6f7f4;--card:#fff;--ink:#1d2b27;--sub:#7b8884;--line:#e6e9e5;--main:#0f7a5f;--c1:#ec5fa6;--c2:#4a8df0;--c3:#12a37f;--c4:#f2a03d;--shadow:rgba(20,40,30,.06);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121816;--card:#1b2420;--ink:#e8efec;--sub:#92a09b;--line:#2b3631;--shadow:rgba(0,0,0,.3)}}
+:root[data-theme="dark"]{--bg:#121816;--card:#1b2420;--ink:#e8efec;--sub:#92a09b;--line:#2b3631;--shadow:rgba(0,0,0,.3)}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;font-size:14px}
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+aside{background:var(--card);border-right:1px solid var(--line);padding:20px 12px;display:flex;flex-direction:column;gap:4px}
+.logo{display:flex;gap:8px;align-items:center;padding:0 8px 16px;font-weight:700;font-size:18px}
+.logo small{display:block;font-size:10px;color:var(--sub);font-weight:400}
+nav button{display:flex;width:100%;gap:10px;align-items:center;padding:10px 12px;border:0;background:none;border-radius:8px;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+nav button:hover{background:color-mix(in srgb,var(--main) 6%,transparent)}
+nav button:focus-visible{outline:2px solid var(--main);outline-offset:-2px}
+nav button.on{background:color-mix(in srgb,var(--main) 12%,transparent);color:var(--main);font-weight:700}
+.motto{margin-top:auto;padding:24px 12px;color:var(--sub);font-size:12px;line-height:1.9}
+.clock{padding:0 12px;color:var(--sub);font-size:12px}
+main{padding:20px 24px 40px;min-width:0}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{margin:0;font-size:20px}header p{margin:4px 0 0;color:var(--sub);font-size:12px}
+.pill{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px;font-size:12px}
+h2{font-size:15px;margin:0 0 12px}h2 span{font-weight:400;color:var(--sub);font-size:12px;margin-left:8px}
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin:24px 0 10px}
+.sec a,.more{color:var(--main);font-size:12px;text-decoration:none;cursor:pointer}
+.grid{display:grid;gap:14px}.g4{grid-template-columns:repeat(4,1fr)}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1.1fr 1.2fr 1fr}.g3b{grid-template-columns:1.3fr 1.1fr 1fr}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;box-shadow:0 1px 3px var(--shadow);min-width:0}
+.kpi .top{display:flex;gap:10px;align-items:center}.ico{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;font-size:20px}
+.kpi b.name{display:block}.kpi small{color:var(--sub);font-size:11px}
+.amt{font-size:24px;font-weight:700;margin:14px 0 8px}.amt small{font-size:12px;color:var(--sub);font-weight:400}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;border-radius:4px}
+.row{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-top:6px;color:var(--sub)}
+.up{color:var(--main);font-weight:700}
+.chartbox{display:grid;grid-template-columns:1fr 170px;gap:12px}
+.chartbox svg{width:100%;height:auto;display:block}
+.stat{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}.stat b{font-size:18px}.stat small{display:block;color:var(--sub);font-size:11px}
+.legend{display:flex;gap:14px;font-size:11px;color:var(--sub);margin-top:8px;flex-wrap:wrap}.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.task{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}.task:last-of-type{border:0}
+.task input{margin-top:3px;accent-color:var(--main);width:16px;height:16px}.task.done .t{text-decoration:line-through;color:var(--sub)}
+.t{font-weight:600}.tm{font-size:11px;color:var(--sub)}
+.tag{font-size:10px;padding:2px 8px;border-radius:10px;margin-left:6px}
+.prog{margin-top:10px;font-size:11px;color:var(--sub)}
+.tabs{display:flex;gap:6px;margin-bottom:10px}.tabs button{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:6px 12px;font-size:12px;cursor:pointer;font-family:inherit}.tabs button.on{background:var(--ink);color:var(--card)}
+.post{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}.post:last-child{border:0}
+.th{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#e9b872,#c97b4a);flex:none}
+.post b{font-size:13px}.post small{display:block;color:var(--sub);font-size:11px}.post .m{font-size:11px;color:var(--sub);margin-top:2px}
+.pl{display:flex;align-items:center;gap:10px;padding:8px 0}.pl .ico{width:36px;height:36px;font-size:16px}.pl span{flex:1}.pl em{color:var(--sub);font-style:normal;font-size:11px}
+.total{display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:6px;padding-top:10px;font-weight:700}
+.ai li{margin-bottom:6px;color:var(--sub);font-size:12px;line-height:1.6}.ai ul{padding-left:16px;margin:8px 0 0}
+.deal{display:flex;gap:10px;align-items:center;padding:8px 0;font-size:12px}.deal div{flex:1}.deal small{display:block;color:var(--sub);font-size:10px}
+.st{font-size:10px;padding:3px 8px;border-radius:6px}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:10px}.quick button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:16px 8px;cursor:pointer;font-family:inherit;font-size:12px}
+.quick button:hover{border-color:var(--main)}
+@media(max-width:1100px){.g4{grid-template-columns:1fr 1fr}.g2,.g3,.g3b{grid-template-columns:1fr}}
+@media(max-width:760px){.app{grid-template-columns:1fr}aside{flex-direction:row;overflow-x:auto;padding:8px}.logo,.motto,.clock{display:none}nav{display:flex}nav button{white-space:nowrap;width:auto}.g4{grid-template-columns:1fr}.chartbox{grid-template-columns:1fr}main{padding:16px}}
+:root[data-theme='dark']{--bg:#0d1524;--card:#131d31;--ink:#e6edf7;--sub:#8b9ab3;--line:#243149;--main:#35d0a0;--shadow:rgba(0,0,0,.35)}
+.sub{color:var(--sub);font-size:12px;font-weight:400}
+.day h2{display:flex;justify-content:space-between;align-items:center}.day h2 em{font-style:normal;color:var(--c2);font-size:12px;margin-left:6px}
+.day.today{border-color:var(--c2);box-shadow:0 0 0 1px var(--c2)}
+.badge{font-size:11px;font-weight:400;background:var(--line);border-radius:10px;padding:2px 8px;color:var(--sub)}
+.day .task{padding:6px 0;border:0;align-items:center}.task .x{margin-left:auto;border:0;background:none;color:var(--sub);cursor:pointer;opacity:0;font-size:16px}.task:hover .x,.task .x:focus{opacity:1}
+.addbtn{border:0;background:none;color:var(--main);cursor:pointer;font:inherit;font-size:12px;padding:8px 0}
+.addf{display:flex;gap:4px;margin-top:6px}.addf input,.addf select,.memoin{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;font-size:12px;min-width:0}.addf input{flex:1}
+#mlist{max-height:340px;overflow:auto}#mlist .task{align-items:flex-start}
+.gl{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}.gl:last-child{border:0}.gl .bar{margin:5px 0}
+.wk{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px}.wk:last-child{border:0}.wk b{flex:none;width:48px;height:fit-content;text-align:center;background:var(--bg);border-radius:8px;padding:6px 0}.wk ul{margin:0;padding:0;list-style:none;flex:1}.wk li{display:flex;justify-content:space-between;gap:8px;margin:3px 0}.wk li span{color:var(--sub)}
+.memo{list-style:none;padding:0;margin:0 0 8px}.memo li{display:flex;gap:6px;padding:5px 0;font-size:12px}.memo button{margin-left:auto;border:0;background:none;color:var(--sub);cursor:pointer}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 16px;border-radius:20px;font-size:12px;opacity:0;pointer-events:none;transition:opacity .2s}.toast.show{opacity:1}
+.blank{gap:8px}.task input.newt{flex:1;width:auto;height:auto;margin:0;background:transparent;color:var(--ink);border:0;border-bottom:1px dashed var(--line);border-radius:0;padding:4px 2px;font:inherit;font-size:13px;min-width:0}.task input.newt:focus{outline:none;border-bottom-color:var(--main)}
+.blank input[disabled]{opacity:.45}.blank select{display:none;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:3px 4px;font:inherit;font-size:11px;max-width:84px}.blank:focus-within select{display:block}
+:root[data-theme='dark']{color-scheme:dark}
+.blank2{padding:6px 0 8px}.blank2 .r1{display:flex;align-items:center;gap:8px}.blank2 .r1 input[type=checkbox]{width:16px;height:16px;margin:0;opacity:.45}.blank2 .r1 span{width:16px;text-align:center;color:var(--main)}
+.blank2 .newt{flex:1;min-width:0;background:transparent;color:var(--ink);border:0;border-bottom:1px dashed var(--line);padding:4px 2px;font:inherit;font-size:13px}.blank2 .newt:focus{outline:none;border-bottom-color:var(--main)}
+.blank2 .ex{display:none;gap:4px;margin:6px 0 0 24px;flex-wrap:wrap}.blank2:focus-within .ex{display:flex}
+.ex input,.ex select{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:3px 6px;font:inherit;font-size:11px;min-width:0}.ex .tmv{width:110px}
+.wk .x{border:0;background:none;color:var(--sub);cursor:pointer;opacity:0;font-size:16px;padding:0 2px}.wk li:hover .x,.wk .x:focus{opacity:1}
+@media (hover:none){.task .x,.wk .x{opacity:.6}}
+.n3{grid-template-columns:1fr 1fr .8fr}.n2{grid-template-columns:.95fr 1.1fr}.n4{grid-template-columns:1.2fr 1.2fr .9fr .9fr}
+@media(max-width:1100px){.n3,.n2,.n4{grid-template-columns:1fr}}
+.st3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.big{font-size:22px;font-weight:700;margin:4px 0}.big .up{font-size:11px}
+.pf{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:6px;font-size:13px;margin-right:6px}
+.note{background:var(--bg);border-radius:8px;padding:10px;font-size:11px;color:var(--sub);margin-top:10px;line-height:1.6}.warn{background:color-mix(in srgb,var(--c4) 14%,transparent)}
+.tbl{overflow-x:auto}.th2,.tr{display:grid;grid-template-columns:2.4fr .7fr 1fr 1fr 1fr;gap:8px;align-items:center;font-size:12px;padding:8px 0;border-bottom:1px solid var(--line);min-width:440px}.nd.th2,.nd.tr{grid-template-columns:2.4fr 1fr 1fr 1fr}.th2{color:var(--sub);font-size:11px}.tr:last-child{border:0}
+.pt{display:flex;gap:8px;align-items:center;min-width:0}.thumb{width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,#e9b872,#c97b4a);flex:none}
+.rk{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:12px}.rk:last-child{border:0}
+.acts label{display:flex;gap:8px;align-items:flex-start;font-size:12px;margin:8px 0}.acts input{accent-color:var(--main);margin-top:2px}
+.h3{grid-template-columns:1.25fr 1fr .95fr}.h3b{grid-template-columns:1.2fr 1fr .9fr}
+@media(max-width:1100px){.h3,.h3b{grid-template-columns:1fr}}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.hd .tabs{margin:0}
+.st4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.mid{font-size:18px;font-weight:700;margin:3px 0}.big .dn{color:#e5675f;font-size:11px}
+.sk.th2,.sk.tr{grid-template-columns:2.2fr .8fr 1fr 1fr;min-width:400px}
+.bd{font-size:10px;padding:3px 8px;border-radius:10px;text-align:center}.bd.g{background:#1f6f55;color:#d8fff0}.bd.y{background:#6b5a14;color:#fff3c2}.bd.o{background:#8a4b12;color:#ffe3c4}
+.ai2 p{font-size:12px;color:var(--sub);line-height:1.7;margin:4px 0}.ai2 ul{font-size:12px;color:var(--sub);padding-left:16px;margin:4px 0}.ai2 b{display:block;margin-top:12px;font-size:13px}
+.l2{grid-template-columns:.9fr 1.1fr}.l3{grid-template-columns:1.2fr .9fr 1.1fr}@media(max-width:1100px){.l2,.l3{grid-template-columns:1fr}}
+.acc{padding:0;overflow:hidden;cursor:pointer}.acc.sel{border-color:var(--main);box-shadow:0 0 0 1px var(--main)}.cv{height:64px}.ab{padding:0 14px 14px}
+.av{width:44px;height:44px;border-radius:50%;background:#f3ecd9;color:#222;display:grid;place-items:center;font-weight:700;margin-top:-22px;border:2px solid var(--card);flex:none}
+.r2{grid-template-columns:1.5fr 1fr}.r3{grid-template-columns:1.25fr .9fr .9fr}.a3{grid-template-columns:1.2fr 1fr 1fr}.r2i{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center}
+@media(max-width:1100px){.r2,.r3,.a3,.r2i{grid-template-columns:1fr}}
+.dn{color:#e5675f;font-weight:700}
+.bz.th2,.bz.tr{grid-template-columns:1.4fr 1fr 1fr 1fr;min-width:300px}.lg.th2,.lg.tr{grid-template-columns:.6fr 2fr 1.1fr .9fr .6fr 22px;min-width:520px}
+.lg .st{border:0;cursor:pointer;color:#111;font:inherit;font-size:10px;margin-top:3px}.lg .x{border:0;background:none;color:var(--sub);cursor:pointer;font-size:16px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}.lr{display:flex;justify-content:space-between;font-size:12px;padding:6px 0}
+.dl{width:100%;margin-top:10px;padding:10px;border:1px solid var(--main);background:transparent;color:var(--main);border-radius:8px;font:inherit;cursor:pointer}
+.goal{width:84px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:2px 6px;font:inherit;font-size:11px}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+  <div class="logo">⛰️<div>つぐも<small>事業管理ダッシュボード</small></div></div>
+  <nav id="nav"></nav>
+  <div class="motto">好きなことで<br>生きていく。</div>
+  <div class="clock" id="clock"></div><div class="clock" id="syncst"></div>
+</aside>
+<main>
+<div id='v-home'>
+  <header>
+    <div><h1>おはようございます、つぐもさん</h1><p>今日もいい一日にしましょう。まずは今日のタスクを確認しましょう。</p></div>
+    <div class="pill" id="today"></div>
+  </header>
+
+  <div class="sec"><h2>今月の事業状況<span id="range"></span></h2><a>すべての事業を見る</a></div>
+  <div class="grid g4" id="kpis"></div>
+
+  <div class="grid g2" style="margin-top:14px">
+    <div class="card"><h2>SNSフォロワー数の推移</h2>
+      <div class="chartbox"><div><svg id="line" viewBox="0 0 440 220"></svg>
+        <div class="legend"><span><i style="background:var(--c1)"></i>Instagram</span><span><i style="background:#e5484d"></i>YouTube</span><span><i style="background:var(--c3)"></i>TikTok</span></div></div>
+        <div id="sns"></div></div></div>
+    <div class="card"><h2>売上・収益の推移</h2><svg id="bars" viewBox="0 0 440 240" style="width:100%"></svg>
+      <div class="legend" id="barlegend"></div></div>
+  </div>
+
+  <div class="grid g3" style="margin-top:14px">
+    <div class="card"><h2>今日やること<span id="today2"></span></h2><div id="tasks"></div><div class="prog"><div id="ptext"></div><div class="bar" style="margin-top:6px"><i id="pbar" style="background:var(--main)"></i></div></div></div>
+    <div class="card"><h2>最近の投稿パフォーマンス</h2><div class="tabs" id="tabs"></div><div id="posts"></div></div>
+    <div class="card"><h2>事業別の収支状況</h2><div id="pl"></div></div>
+  </div>
+
+  <div class="grid g3b" style="margin-top:14px">
+    <div class="card ai"><h2>AIからの提案 <span>β</span></h2><b style="font-size:13px">💡 今週のおすすめアクション</b><ul id="ai"></ul></div>
+    <div class="card"><h2>進行中の案件</h2><div id="deals"></div></div>
+    <div class="card"><h2>クイックメニュー</h2><div class="quick" id="quick"></div></div>
+  </div>
+</div>
+<div id='v-task' hidden>
+<header><div><h1>📝 タスク・営業管理 <small class='sub'>やることを整理して、今日も一歩ずつ。</small></h1></div><span class='sub'>コツコツが、未来をつくる。</span></header>
+<div class='grid g4' id='days' style='margin-top:16px'></div>
+<div class='grid g3' style='margin-top:14px'>
+<div class='card'><h2>🎯 今月の目標<span id='rate'></span></h2><div id='goals'></div></div>
+<div class='card'><h2>今月のタスク一覧</h2><div class='tabs' id='ftabs' style='flex-wrap:wrap'></div><div class='blank2' id='mblank'><div class='r1'><input type='checkbox' disabled aria-hidden='true'><input class='newt' maxlength='60' placeholder='タスクを入力（Enterで追加）' aria-label='新しいタスク'></div><div class='ex'><input type='date' aria-label='日付'><select aria-label='事業'></select></div></div><div id='mlist'></div><div class='prog' id='mprog'></div></div>
+<div class='card'><h2>今週の予定</h2><div class='blank2' id='wblank'><div class='r1'><span aria-hidden='true'>＋</span><input class='newt' maxlength='60' placeholder='予定を入力（Enterで追加）' aria-label='新しい予定'></div><div class='ex'><input type='date' aria-label='日付'><input class='tmv' maxlength='20' placeholder='10:00 - 12:00' aria-label='時間'></div></div><div id='week'></div></div></div>
+<div class='grid g3' style='margin-top:14px'>
+<div class='card ai'><h2>AIからの提案 <span>β</span></h2><b style='font-size:13px'>💡 今週のおすすめアクション</b><ul id='tai'></ul></div>
+<div class='card'><h2>メモ・アイデア</h2><ul class='memo' id='memo'></ul><input class='memoin' style='width:100%' placeholder='メモを追加（Enterで保存）'></div>
+<div class='card'><h2>クイックアクション</h2><div class='quick' id='tq'></div></div></div>
+</div>
+<div id='v-nara' hidden>
+<header><div style='display:flex;gap:14px;align-items:center'><div class='ico' style='width:56px;height:56px;border-radius:50%;background:#fdf1e0;font-size:26px'>🍜</div><div><h1>奈良グルメ攻略</h1><p>奈良の美味しいお店を発信するグルメメディア</p></div></div><div class='pill' id='nrange'></div></header>
+<div class='tabs' id='ntabs' style='margin-top:14px'></div>
+<div class='note' style='margin-top:14px'>📡 API未連携のため、数字は0（または空欄）です。連携すると自動で表示されます。</div>
+<div class='grid n3'><div class='card' id='nig'></div><div class='card' id='ntt'></div><div class='card' id='neng'></div></div>
+<div class='grid n2' style='margin-top:14px'>
+<div class='card'><h2>フォロワー数の推移</h2><div class='tabs' id='nrg'></div><div class='chartbox'><div><svg id='nline' viewBox='0 0 440 210' style='width:100%'></svg><div class='legend'><span><i style='background:var(--c1)'></i>Instagram</span><span><i style='background:var(--c3)'></i>TikTok</span></div></div><div id='nside'></div></div></div>
+<div class='card'><h2>直近5件のコンテンツインサイト</h2><div class='tabs' id='nins'></div><div id='ntbl' class='tbl'></div></div></div>
+<div class='grid n4' style='margin-top:14px'>
+<div class='card'><h2>人気のコンテンツ（直近30日）</h2><div class='tabs' id='npt'></div><div id='npop' class='tbl'></div></div>
+<div class='card'><h2>投稿の時間帯別パフォーマンス</h2><svg id='nhour' viewBox='0 0 440 190' style='width:100%'></svg><div class='legend'><span><i style='background:var(--c1)'></i>Instagram</span><span><i style='background:var(--c3)'></i>TikTok</span></div><div class='note warn' id='nbest'></div></div>
+<div class='card'><h2>よく見られているハッシュタグ</h2><div id='ntag'></div></div>
+<div class='card acts'><h2>今後のおすすめアクション</h2><div id='nact'></div><button class='dl' data-dl='1'>⬇ レポートをダウンロード</button></div></div>
+</div>
+<div id='v-hito' hidden>
+<header><div style='display:flex;gap:14px;align-items:center'><div class='ico' style='width:56px;height:56px;border-radius:50%;background:#2a2417;font-size:26px'>🧩</div><div><h1>hitotoki</h1><p>アプリ・物販・SNS運用の分析ダッシュボード</p></div></div><div class='pill' id='hrange'></div></header>
+<div class='note' style='margin-top:16px'>📡 API未連携のため、数字は0（または空欄）です。連携すると自動で表示されます。</div>
+<div class='grid g4' id='hkpi' style='margin-top:14px'></div>
+<div class='grid h3' style='margin-top:14px'>
+<div class='card'><h2 class='hd'><span><span class='pf' style='background:var(--c1)'>📷</span>Instagram インサイト</span><span class='tabs' id='hr1'></span></h2><div class='st4' id='hig'></div><svg id='higc' viewBox='0 0 440 210' style='width:100%;margin-top:8px'></svg><div class='legend'><span><i style='background:#8fbf6f'></i>フォロワー数</span><span><i style='background:#9b7bd9'></i>リーチ</span><span><i style='background:var(--c2)'></i>インプレッション</span></div></div>
+<div class='card'><h2 class='hd'><span><span class='pf' style='background:var(--line)'>@</span>Threads インサイト</span><span class='tabs' id='hr2'></span></h2><div class='st4' id='hth'></div><svg id='hthc' viewBox='0 0 440 210' style='width:100%;margin-top:8px'></svg><div class='legend'><span><i style='background:#8fb4e8'></i>表示回数</span></div></div>
+<div class='card'><h2 class='hd'><span><span class='pf' style='background:var(--c2)'>📲</span>アプリDL数</span><span class='tabs' id='hr3'></span></h2><div class='st4' id='hdl' style='grid-template-columns:1fr 1fr'></div><svg id='hdlc' viewBox='0 0 440 210' style='width:100%;margin-top:8px'></svg><div class='legend'><span><i style='background:var(--c3)'></i>App Store</span><span><i style='background:#e6dcc0'></i>Google Play</span></div><div class='note'>※ App Storeの詳細データはApp Store Connect API、Google PlayはPlay Consoleのレポートから取得します。</div></div></div>
+<div class='grid h3b' style='margin-top:14px'>
+<div class='card'><h2 class='hd'><span>直近5件の投稿</span><span class='tabs' id='hpt'></span></h2><div id='hpost' class='tbl'></div></div>
+<div class='card'><h2 class='hd'><span>在庫・販売状況（輸入販売）</span><span class='tabs' id='hst'></span></h2><div id='hstk' class='tbl'></div><small class='tm'>※ 在庫数は仕入れ・販売の同期により、実際の数値と多少のズレが生じる場合があります。</small></div>
+<div class='card acts ai2'><h2>AIからのインサイト <span>β</span></h2><div id='hai'></div></div></div>
+</div>
+<div id='v-lp' hidden>
+<header><div style='display:flex;gap:14px;align-items:center'><div class='ico' style='width:56px;height:56px;border-radius:12px;background:var(--line);font-size:26px'>🍴</div><div><h1>飲食店アカウント管理</h1><p>運用中の飲食店Instagramアカウントの分析・レポートを確認できます。</p></div></div><div style='display:flex;gap:8px;align-items:center;flex-wrap:wrap'><div class='pill' id='lrange'></div><button class='pill' style='cursor:pointer;color:var(--ink);font:inherit' data-add='1'>＋ アカウントを追加</button></div></header>
+<div class='note' style='margin-top:16px'>📡 API未連携のため、数字は0（または空欄）です。連携すると自動で表示されます。</div>
+<div class='grid g4' id='lacc' style='margin-top:14px'></div>
+<div class='grid l2' style='margin-top:14px'>
+<div class='card'><div id='lhead'></div><div class='chartbox'><div><b>フォロワー推移</b><svg id='lline' viewBox='0 0 440 210' style='width:100%'></svg></div><div id='lside'></div></div></div>
+<div class='card'><h2>🗓 直近5件のコンテンツ分析</h2><div id='lposts' class='tbl'></div></div></div>
+<div class='grid l3' style='margin-top:14px'>
+<div class='card'><h2>他のアカウントのフォロワー推移<span>（直近30日）</span></h2><svg id='lcmp' viewBox='0 0 440 210' style='width:100%'></svg><div class='legend' id='lleg'></div></div>
+<div class='card'><h2>👑 人気のコンテンツランキング</h2><div id='lrank'></div></div>
+<div class='card acts ai2'><h2>AIからの分析・提案 <span>BETA</span></h2><div id='lai'></div></div></div>
+</div>
+<div id='v-ledger' hidden>
+<header><div><h1>📒 収益記録帳 <small class='sub'>売上・経費・入金を記録して、事業ごとの収支を確認できます。</small></h1></div><span class='sub' id='lstamp'></span></header>
+<div class='grid g4' id='lkpi' style='margin-top:16px'></div>
+<div class='grid r2' style='margin-top:14px'>
+<div class='card'><h2 class='hd'><span>事業別の収支</span><span class='tabs' id='lptabs'></span></h2><div class='r2i'><svg id='lbar' viewBox='0 0 440 220' style='width:100%'></svg><div class='tbl'><div id='lbiz'></div></div></div><div class='legend'><span><i style='background:var(--c3)'></i>売上</span><span><i style='background:var(--c1)'></i>経費</span><span><i style='background:#9b7bd9'></i>利益</span></div></div>
+<div class='card'><h2>今月の収支推移</h2><svg id='ltrend' viewBox='0 0 440 210' style='width:100%'></svg><div class='legend'><span><i style='background:var(--c3)'></i>売上</span><span><i style='background:var(--c1)'></i>経費</span></div></div></div>
+<div class='grid r3' style='margin-top:14px'>
+<div class='card'><h2 class='hd'><span>最近の取引</span><span class='tabs' id='lftabs'></span></h2>
+<div class='blank2' id='tblank'><div class='r1'><span aria-hidden='true'>＋</span><input class='newt' maxlength='60' placeholder='取引の内容を入力（Enterで追加）' aria-label='内容'></div><div class='ex'><input type='date' aria-label='日付'><select class='tb' aria-label='事業'></select><input type='number' class='amt' min='0' placeholder='金額' aria-label='金額' style='width:90px'><select class='ty' aria-label='区分'><option value='in'>売上</option><option value='out'>経費</option></select><select class='xx' aria-label='入金状況・カテゴリ'></select></div></div>
+<div class='tbl' id='ltx'></div></div>
+<div class='card'><h2>入金状況</h2><div style='display:flex;gap:14px;align-items:center;flex-wrap:wrap'><svg id='lpay' viewBox='0 0 120 120' width='120' height='120'></svg><div id='lpayl' style='flex:1;min-width:140px'></div></div><div class='note' id='lfix'></div></div>
+<div class='card'><h2>今月の経費カテゴリ TOP5</h2><div style='display:flex;gap:14px;align-items:center;flex-wrap:wrap'><svg id='lcat' viewBox='0 0 120 120' width='120' height='120'></svg><div id='lcatl' style='flex:1;min-width:140px'></div></div></div></div>
+<div class='card ai2' style='margin-top:14px'><h2>AIからの今月のアドバイス <span>β</span></h2><div class='grid a3' id='lai'></div></div>
+</div>
+<div id='toast' class='toast' role='status'></div>
+</main>
+</div>
+
+<script>
+/* ===== データ（ここを書き換えれば画面に反映。将来はAPI/DBに差し替え） ===== */
+const DATA={
+  date:new Date(),
+  businesses:[
+    {key:"nara",name:"奈良グルメ攻略",sub:"PR・地域マーケティング",icon:"🍜",color:"var(--c1)",bg:"#fdf1e0"},
+    {key:"sns",name:"SNS運用事業",sub:"飲食店向けSNS支援",icon:"📱",color:"var(--c2)",bg:"#e8f1fd"},
+    {key:"work",name:"業務委託",sub:"動画制作・ライティング等",icon:"💼",color:"var(--c3)",bg:"#e3f5ee"},
+    {key:"hito",name:"hitotoki",sub:"アプリ・物販",icon:"🎮",color:"var(--c4)",bg:"#efe9fb"}],
+  quick:[["＋","新規タスク作成"],["✏️","データを手動入力"],["📄","レポート出力"],["🔗","外部サービス連携"]],
+  nav:[{id:"home",n:"ホーム",i:"🏠"},{id:"nara",n:"奈良グルメ攻略",i:"🍜"},{id:"hito",n:"hitotoki",i:"🎮"},{id:"lp",n:"飲食店特化のLP屋",i:"🖥️"},{id:"ledger",n:"収益記録帳",i:"📒"},{id:"task",n:"タスク・営業管理",i:"✅"},{id:"analytics",n:"分析",i:"📊"},{id:"settings",n:"設定",i:"⚙️"}]
+};
+/* ===== 描画 ===== */
+const $=id=>document.getElementById(id),yen=n=>"¥ "+n.toLocaleString();
+const B=Object.fromEntries(DATA.businesses.map(b=>[b.key,b]));
+const d=DATA.date,wd="日月火水木金土"[d.getDay()],y=d.getFullYear(),m=d.getMonth()+1;
+const ds=`${y}年${m}月${d.getDate()}日 (${wd})`;
+$("today").textContent="📅 "+ds;$("today2").textContent=` ${m}月${d.getDate()}日 (${wd})`;
+$("range").textContent=`${y}年${m}月1日 〜 ${m}月${new Date(y,m,0).getDate()}日`;
+$("nav").innerHTML=DATA.nav.map((n,i)=>`<button data-id="${n.id}" class="${i?"":"on"}"${i?"":" aria-current=\"page\""}><span>${n.i}</span>${n.n}</button>`).join("");
+$("nav").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;if(!['home','task','nara','hito','lp','ledger'].includes(b.dataset.id)){toast('このページは準備中です');return}
+ $("nav").querySelectorAll("button").forEach(x=>{x.classList.remove("on");x.removeAttribute("aria-current")});
+ b.classList.add("on");b.setAttribute("aria-current","page");show(b.dataset.id);
+ /* TODO: b.dataset.id に応じて画面を切り替える */});
+const tick=()=>{const t=new Date();$("clock").innerHTML=`${ds}<br>🕘 ${String(t.getHours()).padStart(2,"0")}:${String(t.getMinutes()).padStart(2,"0")}`};tick();setInterval(tick,30000);
+
+$("quick").innerHTML=DATA.quick.map(q=>`<button><div style="font-size:18px;margin-bottom:4px">${q[0]}</div>${q[1]}</button>`).join("");
+/* ===== タスク・営業管理 ===== */
+const WD='日月火水木金土',esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const iso=o=>{const x=new Date(d);x.setDate(x.getDate()+o);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
+const TAGS={nara:{n:'奈良グルメ攻略',bg:B.nara.bg},sns:{n:'SNS運用',bg:B.sns.bg},work:{n:'業務委託',bg:B.work.bg},hito:{n:'hitotoki',bg:B.hito.bg},other:{n:'その他',bg:'#e3e8ee'}};
+const load=(k,f)=>{try{const v=JSON.parse(localStorage.getItem(k));if(v)return v}catch(e){}return f},put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('ts:'+k,Date.now())}catch(e){}pushSync(k,v)};
+let tasks=load('tsugumo.tasks.v2',[]);
+let memo=load('tsugumo.memo.v2',[]);
+let flt='all';
+const save=()=>put('tsugumo.tasks.v2',tasks);
+const toast=m=>{const t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1800)};
+function show(id){CUR=id;const vs={home:'v-home',task:'v-task',nara:'v-nara',hito:'v-hito',lp:'v-lp',ledger:'v-ledger'};for(const k in vs)$(vs[k]).hidden=k!==id;if(id==='home')document.documentElement.removeAttribute('data-theme');else document.documentElement.dataset.theme='dark';if(id==='nara'&&!ND)nara();if(id==='hito'&&!HD)hito();if(id==='lp'&&!LD)lp();if(id==='ledger')ledger();if(id==='task'){renderAll();renderGoals()}if(id==='home')renderHome()}
+const row=t=>`<label class='task ${t.done?'done':''}'><input type='checkbox' data-id='${t.id}' ${t.done?'checked':''}><span class='t'>${esc(t.t)}</span><button class='x' data-del='${t.id}' aria-label='削除'>×</button></label>`;
+const LB=['昨日','本日','明日','明後日'];
+function renderDays(){$('days').innerHTML=[-1,0,1,2].map((o,k)=>{const dt=iso(o),L=tasks.filter(t=>t.date===dt),x=new Date(d);x.setDate(x.getDate()+o);
+ return `<div class='card day ${o===0?'today':''}'><h2><span>${x.getMonth()+1}/${x.getDate()} (${WD[x.getDay()]})<em>${LB[k]}</em></span><span class='badge'>${L.filter(t=>t.done).length}/${L.length} 完了</span></h2><div class='task blank' data-date='${dt}'><input type='checkbox' disabled aria-hidden='true'><input class='newt' maxlength='60' placeholder='タスクを入力（Enterで追加）' aria-label='新しいタスク'><select aria-label='事業'>${Object.entries(TAGS).map(([k,v])=>`<option value='${k}' ${k==='other'?'selected':''}>${v.n}</option>`).join('')}</select></div>${L.map(row).join('')}</div>`}).join('')}
+const FT=[['all','すべて'],['nara','奈良グルメ攻略'],['sns','SNS運用'],['work','業務委託'],['hito','hitotoki'],['other','その他']];
+function renderMonth(){const mk=iso(0).slice(0,7),all=tasks.filter(t=>t.date.startsWith(mk)).sort((a,b)=>a.date.localeCompare(b.date)),L=all.filter(t=>flt==='all'||t.b===flt);
+ $('ftabs').innerHTML=FT.map(([k,n])=>`<button class='${k===flt?'on':''}' data-f='${k}'>${n}</button>`).join('');
+ $('mlist').innerHTML=L.map(t=>{const x=new Date(t.date+'T00:00:00');return `<label class='task ${t.done?'done':''}'><input type='checkbox' data-id='${t.id}' ${t.done?'checked':''}><div><div class='t'>${esc(t.t)}</div><div class='tm'>${x.getMonth()+1}/${x.getDate()} (${WD[x.getDay()]})<span class='tag' style='background:${TAGS[t.b].bg};color:#1d2b27'>${TAGS[t.b].n}</span></div></div></label>`}).join('')||'<div class="tm">タスクはありません</div>';
+ $('mprog').textContent=`${L.filter(t=>t.done).length} / ${L.length} 完了`}
+function renderMemo(){$('memo').innerHTML=memo.map((m,i)=>`<li>・${esc(m)}<button data-md='${i}' aria-label='削除'>×</button></li>`).join('')}
+const renderAll=()=>{renderDays();renderMonth()};
+renderAll();renderMemo();
+// 今月の目標・今週の予定・AI・クイック
+const GK='tsugumo.goals.v1';let goals=load(GK,{});
+function renderGoals(){const cur=t=>t.date.startsWith(mk),sales=b=>ledgerTx.filter(t=>cur(t)&&t.type==='in'&&t.b===b).reduce((a,t)=>a+t.amt,0);
+ const gs=DATA.businesses.reduce((a,b)=>a+sales(b.key),0),gg=DATA.businesses.reduce((a,b)=>a+(goals[b.key]||0),0);
+ $('rate').innerHTML=` <span class='sub'>目標達成率 <b class='up'>${gg?Math.round(gs/gg*100)+'%':'—'}</b></span>`;
+ $('goals').innerHTML=DATA.businesses.map(b=>{const v=sales(b.key),g=goals[b.key]||0,p=g?Math.round(v/g*100):0;return `<div class='gl'><div class='ico' style='background:${b.bg}'>${b.icon}</div><div style='flex:1'><b>${b.name}</b><div class='bar'><i style='width:${Math.min(p,100)}%;background:var(--main)'></i></div><span class='tm'>${yen(v)} / 目標 ¥<input class='goal' type='number' min='0' step='1000' value='${g||''}' placeholder='未設定' data-g='${b.key}' aria-label='${b.name}の目標'></span></div><b>${g?p+'%':'—'}</b></div>`}).join('')}
+const EK='tsugumo.events.v2';let events=load(EK,[]);
+function renderWeek(){const days=[...new Set(events.map(e=>e.date))].filter(dt=>dt>=iso(0)&&dt<=iso(6)).sort();
+ $('week').innerHTML=days.map(dt=>{const x=new Date(dt+'T00:00:00');return `<div class='wk'><b>${x.getMonth()+1}/${x.getDate()}<br>${WD[x.getDay()]}</b><ul>${events.filter(e=>e.date===dt).sort((a,b)=>a.time.localeCompare(b.time)).map(e=>`<li>${esc(e.t)}<span>${esc(e.time)}</span><button class='x' data-ev='${e.id}' aria-label='削除'>×</button></li>`).join('')}</ul></div>`}).join('')||'<div class="tm">今週の予定はありません</div>'}
+renderWeek();
+$('tai').innerHTML='<li>記録がたまると、ここにアドバイスが表示されます。</li>';
+$('tq').innerHTML=DATA.quick.map((q,i)=>`<button data-q='${i}'><div style='font-size:18px;margin-bottom:4px'>${q[0]}</div>${q[1]}</button>`).join('');
+// 操作
+const V=$('v-task');
+V.addEventListener('change',e=>{if(e.target.dataset.g){goals[e.target.dataset.g]=Math.max(0,+e.target.value||0);put(GK,goals);renderGoals();return}const id=e.target.dataset.id;if(id){tasks.find(x=>x.id==id).done=e.target.checked;save();renderAll()}});
+V.addEventListener('click',e=>{const g=t=>e.target.closest(t);
+ let x=g('[data-del]');if(x){tasks=tasks.filter(t=>t.id!=x.dataset.del);save();renderAll();return}
+ x=g('[data-f]');if(x){flt=x.dataset.f;renderMonth();return}
+ x=g('[data-md]');if(x){memo.splice(+x.dataset.md,1);put('tsugumo.memo.v2',memo);renderMemo();return}
+ x=g('[data-q]');if(x){if(x.dataset.q==='0')document.querySelector('.day.today .newt').focus();else toast('この機能は準備中です')}});
+V.addEventListener('keydown',e=>{const f=e.target.classList.contains('newt')&&e.target.closest('.blank');
+ if(f&&e.key==='Escape')e.target.value='';
+ if(f&&e.key==='Enter'&&!e.isComposing){const v=e.target.value.trim();if(v){const dt=f.dataset.date;tasks.unshift({id:Date.now(),t:v,date:dt,b:f.querySelector('select').value,done:false});save();renderAll();document.querySelector(`.blank[data-date='${dt}'] .newt`).focus()}}
+ if(e.key==='Enter'&&!e.isComposing&&e.target.classList.contains('memoin')){const v=e.target.value.trim();if(v){memo.push(v);put('tsugumo.memo.v2',memo);e.target.value='';renderMemo()}}});
+// 今月のタスク一覧・今週の予定の入力行
+document.querySelectorAll('#mblank,#wblank').forEach(b=>b.querySelector('input[type=date]').value=iso(0));
+$('mblank').querySelector('select').innerHTML=Object.entries(TAGS).map(([k,v])=>`<option value='${k}' ${k==='other'?'selected':''}>${v.n}</option>`).join('');
+V.addEventListener('keydown',e=>{if(e.key!=='Enter'||e.isComposing||!e.target.classList.contains('newt'))return;const f=e.target.closest('#mblank,#wblank');if(!f)return;const v=e.target.value.trim();if(!v)return;const dt=f.querySelector('input[type=date]').value||iso(0);
+ if(f.id==='mblank'){tasks.unshift({id:Date.now(),t:v,date:dt,b:f.querySelector('select').value,done:false});save();renderAll()}
+ else{events.push({id:Date.now(),t:v,date:dt,time:f.querySelector('.tmv').value.trim()});put(EK,events);renderWeek()}
+ e.target.value='';e.target.focus()});
+V.addEventListener('click',e=>{const x=e.target.closest('[data-ev]');if(x){events=events.filter(v=>v.id!=x.dataset.ev);put(EK,events);renderWeek()}});
+/* ===== 奈良グルメ攻略（SNS分析）=====
+   API接続口: SNS_API の中身を fetch('/api/instagram') などに差し替える。返す形（下のMOCKと同じキー）を合わせれば画面はそのまま動く。
+   アクセストークンはこのHTMLに書かず、サーバー側（Vercel等）に置くこと。 */
+const gen=(e,n,s)=>{const a=e*(1-.08*n/30);return Array.from({length:n},(_,i)=>Math.round(a+(e-a)*i/(n-1)+Math.sin(i*1.7+s)*e*.006))};
+const MOCK={ig:{f:0,fd:0,p:0,pd:0,er:0,ed:0},tt:{f:0,fd:0,p:0,pd:0,v:0,vd:0},eng:{total:0,d:0,note:'API連携後に表示されます。'},posts:{ig:[],tt:[]},tags:[],acts:[]};
+const SNS_API={ig:async n=>({...MOCK.ig,series:gen(MOCK.ig.f,n,0),posts:MOCK.posts.ig,hours:Array.from({length:17},(_,i)=>0)}),
+ tt:async n=>({...MOCK.tt,series:gen(MOCK.tt.f,n,2),posts:MOCK.posts.tt,hours:Array.from({length:17},(_,i)=>0)}),
+ extra:async()=>({eng:MOCK.eng,tags:MOCK.tags,acts:MOCK.acts})};
+const NS={n:30,ins:'ig',pop:'ig'};let ND=null;
+const tabs=(id,a,items,cur)=>{$(id).innerHTML=items.map(([k,n])=>`<button class='${k==cur?'on':''}' data-${a}='${k}'>${n}</button>`).join('')};
+const tbl=(P,pop)=>!P.length?`<div class='tm' style='padding:10px 0'>まだデータがありません</div>`:`<div class='th2 ${pop?'nd':''}'><span>${pop?'ランキング':'投稿内容'}</span>${pop?'':'<span>投稿日</span>'}<span>再生数</span><span>いいね</span><span>保存</span></div>`+P.map((p,i)=>`<div class='tr ${pop?'nd':''}'><span class='pt'>${pop?(i+1)+'':''}<i class='thumb'></i>${esc(p[0])}</span>${pop?'':`<span>${p[1]}</span>`}<span>▷ ${p[2].toLocaleString()}</span><span>♥ ${p[3].toLocaleString()}</span><span>🔖 ${p[4].toLocaleString()}</span></div>`).join('');
+function lineChart(el,S,n){const W=440,H=210,L=40,R=10,T=8,B2=24,mx=Math.max(3000,Math.ceil(Math.max(...S.flatMap(s=>s.v))/3000)*3000);let h='';
+ for(let i=0;i<=3;i++){const y=T+(H-T-B2)*i/3;h+=`<line x1='${L}' x2='${W-R}' y1='${y}' y2='${y}' stroke='var(--line)'/><text x='${L-5}' y='${y+3}' font-size='9' text-anchor='end' fill='var(--sub)'>${((3-i)*mx/3).toLocaleString()}</text>`}
+ S.forEach(s=>h+=`<polyline fill='none' stroke='${s.c}' stroke-width='2' points='${s.v.map((v,i)=>`${L+(W-L-R)*i/(n-1)},${T+(H-T-B2)*(1-v/mx)}`).join(' ')}'/>`);
+ for(let i=0;i<=4;i++){const x=new Date(d);x.setDate(x.getDate()-Math.round((n-1)*(1-i/4)));h+=`<text x='${L+(W-L-R)*i/4}' y='${H-6}' font-size='9' fill='var(--sub)' text-anchor='middle'>${x.getMonth()+1}/${x.getDate()}</text>`}
+ el.innerHTML=h}
+function hourChart(a,b){const W=440,H=190,L=40,T=6,B2=22,mx=15000,bw=(W-L)/17,bh=bw/2.2;let h='';
+ for(let i=0;i<=3;i++){const y=T+(H-T-B2)*i/3;h+=`<line x1='${L}' x2='${W}' y1='${y}' y2='${y}' stroke='var(--line)'/><text x='${L-5}' y='${y+3}' font-size='9' text-anchor='end' fill='var(--sub)'>${((3-i)*5000).toLocaleString()}</text>`}
+ [a,b].forEach((arr,k)=>arr.forEach((v,i)=>{const hh=Math.min(v,mx)/mx*(H-T-B2);h+=`<rect x='${L+i*bw+k*bh+1}' y='${H-B2-hh}' width='${bh-.5}' height='${hh}' fill='${k?'var(--c3)':'var(--c1)'}'/>`}));
+ for(let i=0;i<17;i+=3)h+=`<text x='${L+i*bw+bw/2}' y='${H-6}' font-size='9' fill='var(--sub)' text-anchor='middle'>${6+i}時</text>`;
+ $('nhour').innerHTML=h;let best=0,bs=0;for(let i=0;i<=14;i++){const s=a[i]+a[i+1]+a[i+2]+b[i]+b[i+1]+b[i+2];if(s>bs){bs=s;best=i}}
+ $('nbest').innerHTML=bs===0?'💡 データがたまると、反応が良い時間帯が表示されます。':`💡 最も反応が良い時間帯は <b>${6+best}時〜${9+best}時</b> です。この時間に投稿すると、より多くの人に届きやすくなります。`}
+function drawNara(){if(!ND)return;const {ig,tt,ex}=ND,up=v=>`<span class='up'>↑ +${v}%</span>`,
+ stat=(l,v,dl,s)=>`<div><small class='tm'>${l}</small><div class='big'>${v} ${up(dl)}</div><small class='tm'>(${s})</small></div>`;
+ $('nig').innerHTML=`<h2><span class='pf' style='background:var(--c1)'>📷</span>Instagram</h2><div class='st3'>${stat('フォロワー数',ig.f.toLocaleString(),ig.fd,'前月比')}${stat('投稿数',ig.p,ig.pd,'今月')}${stat('平均エンゲージメント率',ig.er+'%',ig.ed,'前月比')}</div>`;
+ $('ntt').innerHTML=`<h2><span class='pf' style='background:var(--c3)'>🎵</span>TikTok</h2><div class='st3'>${stat('フォロワー数',tt.f.toLocaleString(),tt.fd,'前月比')}${stat('投稿数',tt.p,tt.pd,'今月')}${stat('平均再生数',tt.v.toLocaleString(),tt.vd,'前月比')}</div>`;
+ $('neng').innerHTML=`<h2>今月の総合エンゲージメント</h2><div class='big'>${ex.eng.total.toLocaleString()} ${up(ex.eng.d)}</div><small class='tm'>(前月比)</small><div class='note'>${esc(ex.eng.note)}</div>`;
+ tabs('nrg','rg',[[7,'7日'],[30,'30日'],[90,'90日']],NS.n);
+ lineChart($('nline'),[{v:ig.series,c:'var(--c1)'},{v:tt.series,c:'var(--c3)'}],NS.n);
+ $('nside').innerHTML=[['📷',ig],['🎵',tt]].map(([i,x])=>`<div class='stat'><b>${i} ${x.f.toLocaleString()}</b> ${up(x.fd)}<small>フォロワー数（前月比）</small></div>`).join('');
+ const P=[['ig','Instagram'],['tt','TikTok']];tabs('nins','ins',P,NS.ins);tabs('npt','pop',P,NS.pop);
+ $('ntbl').innerHTML=tbl(ND[NS.ins].posts,0);$('npop').innerHTML=tbl([...ND[NS.pop].posts].sort((a,b)=>b[2]-a[2]),1);
+ hourChart(ig.hours,tt.hours);
+ $('ntag').innerHTML=ex.tags.map(([t,c],i)=>`<div class='rk'><span>${i+1}　${esc(t)}</span><span class='tm'>${c}</span></div>`).join('');
+ $('nact').innerHTML=ex.acts.map(a=>`<label><input type='checkbox' checked><span>${esc(a)}</span></label>`).join('')}
+async function nara(){$('nrange').textContent=`📅 ${y}年${m}月1日 〜 ${y}年${m}月${d.getDate()}日`;
+ tabs('ntabs','nt',['サマリー','フォロワー推移','コンテンツ分析','競合分析','レポート'].map((n,i)=>[i,n]),0);
+ const [ig,tt,ex]=await Promise.all([SNS_API.ig(NS.n),SNS_API.tt(NS.n),SNS_API.extra()]);ND={ig,tt,ex};drawNara()}
+$('v-nara').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const D=b.dataset;
+ if(D.rg){NS.n=+D.rg;nara()}else if(D.ins){NS.ins=D.ins;drawNara()}else if(D.pop){NS.pop=D.pop;drawNara()}else if((D.nt&&D.nt!=='0')||D.dl)toast('この機能は準備中です')});
+/* ===== hitotoki（アプリ・物販・SNS）=====
+   API接続口: HITO_API の中身をサーバー経由のfetchに差し替える（App Store Connect / Google Play / Instagram / Threads / 在庫管理など）。キーはサーバー側で保管。 */
+const HM={kpi:[['アプリ総ダウンロード数','📱','0','0%',1,'先月 0'],['今月の売上（物販）','📦','¥ 0','0%',1,'先月 ¥0'],['在庫数（全商品）','🗃️','0 個','0%',1,'先月 0個'],['今月の総再生数（SNS）','▶️','0','0%',1,'先月 0']],
+ ig:{s:[['フォロワー数',0,0],['リーチ',0,0],['インプレッション',0,0],['保存数',0,0]],plot:[0,0,0]},
+ th:{s:[['フォロワー数',0,0],['表示回数',0,0],['リアクション',0,0],['シェア',0,0]],plot:0},
+ dl:{as:[0,0],gp:[0,0]},stock:[],ai:{grow:'データがたまると、ここに分析が表示されます。',ideas:[],todo:[]}};
+const HITO_API={kpi:async()=>HM.kpi,ig:async n=>({...HM.ig,series:HM.ig.plot.map((e,i)=>gen(e,n,i))}),th:async n=>({...HM.th,series:[gen(HM.th.plot,n,3)]}),
+ dl:async n=>({...HM.dl,a:Array(n).fill(0),b:Array(n).fill(0)}),posts:async()=>({ig:MOCK.posts.ig,th:MOCK.posts.tt}),stock:async()=>HM.stock,ai:async()=>HM.ai};
+const HS={r1:30,r2:30,r3:30,pt:'ig',st:'stock'};let HD=null;
+const spark=(up,s)=>`<svg viewBox='0 0 110 40' width='110' height='40'><polyline fill='none' stroke='${up?'var(--main)':'#e5675f'}' stroke-width='2' points='${Array.from({length:14},(_,i)=>`${i*8.4},${(36-((up?i*1.5:14-i*.4)+Math.sin(i*1.9+s)*3)).toFixed(1)}`).join(' ')}'/></svg>`;
+function barChart(el,A,B){const n=A.length,W=440,H=210,L=40,T=8,B2=24,mx=9000,bw=(W-L-4)/n,bh=bw/2.2;let h='';
+ for(let i=0;i<=3;i++){const y=T+(H-T-B2)*i/3;h+=`<line x1='${L}' x2='${W}' y1='${y}' y2='${y}' stroke='var(--line)'/><text x='${L-5}' y='${y+3}' font-size='9' text-anchor='end' fill='var(--sub)'>${((3-i)*3000).toLocaleString()}</text>`}
+ [A,B].forEach((arr,k)=>arr.forEach((v,i)=>{const hh=Math.min(v,mx)/mx*(H-T-B2);h+=`<rect x='${L+i*bw+k*bh}' y='${H-B2-hh}' width='${bh-.4}' height='${hh}' fill='${k?'#e6dcc0':'var(--c3)'}'/>`}));
+ for(let i=0;i<=4;i++){const x=new Date(d);x.setDate(x.getDate()-Math.round((n-1)*(1-i/4)));h+=`<text x='${L+(W-L)*i/4}' y='${H-6}' font-size='9' fill='var(--sub)' text-anchor='middle'>${x.getMonth()+1}/${x.getDate()}</text>`}
+ el.innerHTML=h}
+function drawHito(){if(!HD)return;const {kpi,ig,th,dl,posts,stock,ai}=HD,RG=[[7,'7日'],[30,'30日'],[90,'90日']],
+ up=v=>`<span class='up'>↑ +${v}%</span>`,st=(l,v,dv)=>`<div><small class='tm'>${l}</small><div class='mid'>${v.toLocaleString()}</div>${up(dv)}</div>`;
+ $('hkpi').innerHTML=kpi.map(([n,ic,v,dv,u,pv],i)=>`<div class='card'><div style='display:flex;gap:8px;align-items:center'><span class='pf' style='background:var(--line)'>${ic}</span><small>${n}</small></div><div style='display:flex;justify-content:space-between;align-items:flex-end'><div><div class='big'>${v} <span class='${u?'up':'dn'}'>${u?'↑':'↓'} ${dv}</span></div><small class='tm'>${pv}</small></div>${spark(u,i)}</div></div>`).join('');
+ tabs('hr1','r1',RG,HS.r1);tabs('hr2','r2',RG,HS.r2);tabs('hr3','r3',RG,HS.r3);
+ $('hig').innerHTML=ig.s.map(a=>st(...a)).join('');$('hth').innerHTML=th.s.map(a=>st(...a)).join('');
+ $('hdl').innerHTML=[['App Store',dl.as],['Google Play',dl.gp]].map(([n,a])=>st(n,a[0],a[1])).join('');
+ lineChart($('higc'),ig.series.map((v,i)=>({v,c:['#8fbf6f','#9b7bd9','var(--c2)'][i]})),HS.r1);
+ lineChart($('hthc'),[{v:th.series[0],c:'#8fb4e8'}],HS.r2);barChart($('hdlc'),dl.a,dl.b);
+ const P=[['ig','Instagram'],['th','Threads']];tabs('hpt','pt',P,HS.pt);$('hpost').innerHTML=tbl(posts[HS.pt],0);
+ tabs('hst','st',[['stock','在庫'],['sales','販売数']],HS.st);
+ const S2=[...stock].sort((a,b)=>HS.st==='stock'?b[1]-a[1]:b[2]-a[2]),sb=n=>n>=30?['在庫あり','g']:n>=10?['残りわずか','y']:['在庫少なめ','o'];
+ $('hstk').innerHTML=`<div class='th2 sk'><span>商品名</span><span>在庫数</span><span>今月の販売数</span><span>ステータス</span></div>`+S2.map(p=>`<div class='tr sk'><span class='pt'><i class='thumb'></i>${esc(p[0])}</span><span>${p[1]}</span><span>${p[2]}</span><span class='bd ${sb(p[1])[1]}'>${sb(p[1])[0]}</span></div>`).join('');
+ $('hai').innerHTML=`<b>📈 今月の成長ポイント</b><p>${esc(ai.grow)}</p><b>💡 おすすめの投稿企画</b><ul>${ai.ideas.map(a=>`<li>${esc(a)}</li>`).join('')}</ul><b>🎯 次にやるべきこと</b>${ai.todo.map(a=>`<label><input type='checkbox'><span>${esc(a)}</span></label>`).join('')}`}
+async function hito(){const last=new Date(y,m,0).getDate();$('hrange').textContent=`📅 ${y}年${m}月1日 〜 ${y}年${m}月${last}日`;
+ const [kpi,ig,th,dl,posts,stock,ai]=await Promise.all([HITO_API.kpi(),HITO_API.ig(HS.r1),HITO_API.th(HS.r2),HITO_API.dl(HS.r3),HITO_API.posts(),HITO_API.stock(),HITO_API.ai()]);HD={kpi,ig,th,dl,posts,stock,ai};drawHito()}
+$('v-hito').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const D=b.dataset;
+ if(D.r1||D.r2||D.r3){if(D.r1)HS.r1=+D.r1;if(D.r2)HS.r2=+D.r2;if(D.r3)HS.r3=+D.r3;hito()}else if(D.pt){HS.pt=D.pt;drawHito()}else if(D.st){HS.st=D.st;drawHito()}});
+/* ===== 飲食店特化のLP屋（飲食店アカウント管理）=====
+   API接続口: LP_API の中身をサーバー経由のfetchに差し替える（店ごとのInstagramアカウントの数値を返す）。キーはサーバー側で保管。 */
+const LPC=['#35d0a0','#9b7bd9','#ec5fa6','#4a8df0'],LPG=['#5a3b1a,#c9842b','#2f3b2a,#8a9a4a','#4a1d1d,#c0463a','#2a2f3f,#8a7fb5'];
+const LPM={acc:[],k:[],posts:[],ai:{trend:[],acts:[]}};
+const LP_API={accounts:async n=>LPM.acc.map((a,i)=>({id:i,name:a[0],h:a[1],f:a[2],d:a[3],ic:a[4],series:gen(a[2],n,i)})),
+ posts:async id=>LPM.posts.map(p=>[p[0],p[1],...[2,3,4].map(j=>Math.round(p[j]*LPM.k[id]))]),ai:async()=>LPM.ai};
+const LS={sel:0};let LD=null;
+function drawLp(){if(!LD)return;const {acc,posts,ai}=LD,a=acc[LS.sel],up=v=>`<span class='up'>↑ +${v}%</span>`,fmt=v=>v.toLocaleString();
+ if(!acc.length){$('lacc').innerHTML=`<div class='card' style='grid-column:1/-1'><small class='tm'>運用中の飲食店アカウントはまだありません。API連携後にここへ表示されます。</small></div>`;['lhead','lline','lside','lposts','lcmp','lleg','lrank','lai'].forEach(i=>$(i).innerHTML='');return}
+ $('lacc').innerHTML=acc.map((x,i)=>`<div class='card acc ${i===LS.sel?'sel':''}' data-sel='${i}'><div class='cv' style='background:linear-gradient(135deg,${LPG[i]})'></div><div class='ab'><div style='display:flex;gap:10px;align-items:flex-end'><div class='av'>${x.ic}</div><div style='flex:1;min-width:0'><b>${esc(x.name)}</b><br><small class='tm'>${x.h}</small></div><span class='bd g'>運用中</span></div><div style='display:flex;justify-content:space-between;align-items:flex-end;margin-top:10px'><div><div class='big'>${fmt(x.f)} ${up(x.d)}</div><small class='tm'>フォロワー（前月比）</small></div>${spark(1,i)}</div><div class='row'><span>📷 Instagram</span><button class='pill' style='cursor:pointer;color:var(--ink);font:inherit;font-size:11px' data-sel='${i}'>詳細を見る →</button></div></div></div>`).join('');
+ const k=Math.max(2,Math.min(d.getDate(),a.series.length)),s=a.series.slice(-k),inc=s[k-1]-s[0],best=s.reduce((b,v,i)=>i&&v-s[i-1]>b[1]?[i,v-s[i-1]]:b,[0,0]),bd=new Date(d);bd.setDate(bd.getDate()-(k-1-best[0]));
+ $('lhead').innerHTML=`<div style='display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px;flex-wrap:wrap'><div style='display:flex;gap:10px;align-items:center'><div class='av' style='margin:0'>${a.ic}</div><div><b>${esc(a.name)}</b><br><small class='tm'>${a.h} 📷 Instagram</small></div></div><button class='pill' style='cursor:pointer;color:var(--ink);font:inherit' data-nx='1'>このアカウントの詳細</button></div>`;
+ lineChart($('lline'),[{v:s,c:LPC[LS.sel]}],k);
+ $('lside').innerHTML=`<div class='big'>${fmt(a.f)}</div><small class='tm'>フォロワー</small><div>${up(a.d)} <small class='tm'>(前月比)</small></div><div class='stat' style='margin-top:10px'><small>今月の増加数</small><b>+${fmt(inc)}</b></div><div class='stat'><small>1日の平均増加</small><b>+${Math.round(inc/(k-1))}</b></div><div class='stat'><small>最高増加日</small><b>${bd.getMonth()+1}/${bd.getDate()} (+${best[1]})</b></div>`;
+ $('lposts').innerHTML=`<div class='th2 nd'><span>投稿内容</span><span>再生数</span><span>いいね</span><span>保存</span></div>`+posts.map(p=>`<div class='tr nd'><span class='pt'><i class='thumb'></i><span>${esc(p[0])}<br><small class='tm'>${p[1]}</small></span></span><span>▷ ${fmt(p[2])}</span><span>♥ ${fmt(p[3])}</span><span>🔖 ${fmt(p[4])}</span></div>`).join('');
+ lineChart($('lcmp'),acc.map((x,i)=>({v:x.series,c:LPC[i]})),acc[0].series.length);
+ $('lleg').innerHTML=acc.map((x,i)=>`<span><i style='background:${LPC[i]}'></i>${esc(x.name)}</span>`).join('');
+ $('lrank').innerHTML=[...posts].sort((x,y)=>y[2]-x[2]).slice(0,3).map((p,i)=>`<div class='rk' style='align-items:center;gap:10px'><b style='font-size:20px;width:20px'>${i+1}</b><i class='thumb'></i><span style='flex:1;min-width:0'>${esc(p[0])}<br><small class='tm'>▷ ${fmt(p[2])}　♥ ${fmt(p[3])}　🔖 ${fmt(p[4])}</small></span></div>`).join('');
+ $('lai').innerHTML=`<b>今月のパフォーマンス傾向</b><ul>${ai.trend.map(t=>`<li>${esc(t)}</li>`).join('')}</ul><b>次のおすすめアクション</b>${ai.acts.map(t=>`<label><input type='checkbox' checked><span>${esc(t)}</span></label>`).join('')}`}
+async function lp(){$('lrange').textContent=`📅 ${y}年${m}月1日 〜 ${y}年${m}月${d.getDate()}日`;
+ const acc=await LP_API.accounts(30),[posts,ai]=await Promise.all([LP_API.posts(LS.sel),LP_API.ai()]);LD={acc,posts,ai};drawLp()}
+$('v-lp').addEventListener('click',e=>{const s=e.target.closest('[data-sel]');if(s){LS.sel=+s.dataset.sel;lp();return}if(e.target.closest('[data-add],[data-nx]'))toast('この機能は準備中です')});
+/* ===== 収益記録帳 =====
+   取引はブラウザに保存（localStorage）。将来はAPI/DBに差し替える場合は ledgerTx の読み書き（load/put）を置き換える。 */
+const LK='tsugumo.ledger.v2',CATS=['仕入・商品原価','外注費','飲食・取材費','通信費・サブスク','固定費','その他'],ST={paid:['入金済み','#35d0a0'],wait:['入金待ち','#f2a03d'],unpaid:['未入金','#e5675f']},yen2=n=>'¥'+Math.round(n).toLocaleString();
+const mkey=o=>{const x=new Date(y,m-1+o,1);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')},mk=mkey(0),pk=mkey(-1),dd=(k,n)=>k+'-'+String(n).padStart(2,'0');
+let ledgerTx=load(LK,[]);
+const LF={p:'cur',f:'all'},LVw=$('v-ledger'),TB=$('tblank');
+function donut(el,parts,ctr){const R=40,C=2*Math.PI*R,tot=parts.reduce((s,p)=>s+p.v,0)||1;let off=0,h=`<circle cx='60' cy='60' r='${R}' fill='none' stroke='var(--line)' stroke-width='16'/>`;
+ parts.forEach(p=>{const len=p.v/tot*C;h+=`<circle cx='60' cy='60' r='${R}' fill='none' stroke='${p.c}' stroke-width='16' stroke-dasharray='${len} ${C-len}' stroke-dashoffset='${-off}' transform='rotate(-90 60 60)'/>`;off+=len});
+ h+=`<text x='60' y='56' text-anchor='middle' font-size='9' fill='var(--sub)'>${ctr[0]}</text><text x='60' y='72' text-anchor='middle' font-size='13' font-weight='700' fill='var(--ink)'>${ctr[1]}</text>`;el.innerHTML=h}
+function bizBar(el,rows){const W=440,H=220,L=40,T=8,B2=26,mx=Math.max(100000,Math.ceil(Math.max(...rows.flatMap(r=>[r.s,r.e,r.p]))/100000)*100000),gw=(W-L)/Math.max(rows.length,1),bw=gw/4;let h='';
+ for(let i=0;i<=4;i++){const yy=T+(H-T-B2)*i/4;h+=`<line x1='${L}' x2='${W}' y1='${yy}' y2='${yy}' stroke='var(--line)'/><text x='${L-5}' y='${yy+3}' font-size='9' text-anchor='end' fill='var(--sub)'>${(4-i)*mx/4/1000}k</text>`}
+ rows.forEach((r,i)=>{[[r.s,'var(--c3)'],[r.e,'var(--c1)'],[Math.max(r.p,0),'#9b7bd9']].forEach(([v,c],k)=>{const hh=v/mx*(H-T-B2);h+=`<rect x='${L+i*gw+gw*.15+k*bw}' y='${H-B2-hh}' width='${bw-2}' height='${hh}' fill='${c}'/>`});h+=`<text x='${L+i*gw+gw/2}' y='${H-8}' font-size='8' fill='var(--sub)' text-anchor='middle'>${esc(r.n)}</text>`});
+ el.innerHTML=h}
+function ledger(){const T=ledgerTx,cur=t=>t.date.startsWith(mk),prv=t=>t.date.startsWith(pk),sum=f=>T.filter(f).reduce((s,t)=>s+t.amt,0),fmt=yen2,
+ inc=sum(t=>cur(t)&&t.type==='in'),exp=sum(t=>cur(t)&&t.type==='out'),pin=sum(t=>prv(t)&&t.type==='in'),pex=sum(t=>prv(t)&&t.type==='out'),prof=inc-exp,pprof=pin-pex,
+ unL=T.filter(t=>cur(t)&&t.type==='in'&&t.x==='unpaid'),unS=unL.reduce((s,t)=>s+t.amt,0),dl=(a,b)=>b?Math.round((a-b)/Math.abs(b)*100):0,sg=v=>(v>=0?'+':'')+v;
+ $('lstamp').textContent=`最終更新 ${m}/${d.getDate()}`;
+ const K=[['総売上（今月）','💰',fmt(inc),'先月 '+fmt(pin),dl(inc,pin),1],['総経費（今月）','🧾',fmt(exp),'先月 '+fmt(pex),dl(exp,pex),0],['今月の利益（概算）','📈',fmt(prof),'先月 '+fmt(pprof),dl(prof,pprof),1],['未入金（今月）','⏳',fmt(unS),`${unL.length}件`,null,0]];
+ $('lkpi').innerHTML=K.map(([n,ic,v,sub,dv,hi],i)=>{const good=dv===null?0:(hi?dv>=0:dv<=0);return `<div class='card'><div style='display:flex;gap:8px;align-items:center'><span class='pf' style='background:var(--line)'>${ic}</span><small>${n}</small></div><div style='display:flex;justify-content:space-between;align-items:flex-end'><div><div class='big'>${v} ${dv===null?'':`<span class='${good?'up':'dn'}'>${dv>=0?'↑ +':'↓ '}${dv}%</span>`}</div><small class='tm'>${sub}</small></div>${dv===null?'':spark(dv>=0,i)}</div></div>`}).join('');
+ const P=LF.p,inP=t=>P==='cur'?cur(t):P==='prev'?prv(t):t.date.startsWith(String(y));
+ tabs('lptabs','lp',[['cur','今月'],['prev','先月'],['year','今年']],P);
+ const rows=Object.keys(TAGS).map(b=>{const s=sum(t=>inP(t)&&t.b===b&&t.type==='in'),e=sum(t=>inP(t)&&t.b===b&&t.type==='out');return {n:TAGS[b].n,s,e,p:s-e}}).filter(r=>r.s||r.e);
+ bizBar($('lbar'),rows);
+ $('lbiz').innerHTML=`<div class='th2 bz'><span>事業</span><span>売上</span><span>経費</span><span>利益</span></div>`+rows.map(r=>`<div class='tr bz'><span>${esc(r.n)}</span><span>${fmt(r.s)}</span><span>${fmt(r.e)}</span><span class='${r.p>=0?'up':'dn'}'>${fmt(r.p)}</span></div>`).join('');
+ const n=Math.max(2,d.getDate()),cum=ty=>Array.from({length:n},(_,i)=>{const dt=iso(-(n-1-i));return sum(t=>cur(t)&&t.type===ty&&t.date<=dt)});
+ lineChart($('ltrend'),[{v:cum('in'),c:'var(--c3)'},{v:cum('out'),c:'var(--c1)'}],n);
+ tabs('lftabs','lf',[['all','すべて'],['in','売上'],['out','経費']],LF.f);
+ const L=[...T].filter(t=>LF.f==='all'||t.type===LF.f).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).slice(0,8);
+ $('ltx').innerHTML=`<div class='th2 lg'><span>日付</span><span>内容</span><span>事業</span><span>金額</span><span>区分</span><span></span></div>`+(L.map(t=>{const x=new Date(t.date+'T00:00:00');return `<div class='tr lg'><span>${x.getMonth()+1}/${x.getDate()}</span><span>${esc(t.t)}<br>${t.type==='in'?`<button class='bd st' data-cy='${t.id}' style='background:${ST[t.x][1]}' title='クリックで切り替え'>${ST[t.x][0]}</button>`:`<small class='tm'>${esc(t.x)}</small>`}</span><span>${TAGS[t.b].n}</span><span>${fmt(t.amt)}</span><span class='${t.type==='in'?'up':'dn'}'>${t.type==='in'?'売上':'経費'}</span><button class='x' data-ldel='${t.id}' aria-label='削除'>×</button></div>`}).join('')||`<div class='tm' style='padding:10px 0'>取引はまだありません</div>`);
+ const cu=T.filter(t=>cur(t)&&t.type==='in'),ps=k=>cu.filter(t=>t.x===k).reduce((s,t)=>s+t.amt,0),tot=cu.reduce((s,t)=>s+t.amt,0);
+ donut($('lpay'),Object.keys(ST).map(k=>({v:ps(k),c:ST[k][1]})),['入金済み',(tot?Math.round(ps('paid')/tot*100):0)+'%']);
+ $('lpayl').innerHTML=Object.keys(ST).map(k=>`<div class='lr'><span><i class='dot' style='background:${ST[k][1]}'></i>${ST[k][0]}</span><b>${fmt(ps(k))}</b></div>`).join('')+`<div class='lr' style='border-top:1px solid var(--line)'><span>合計</span><b>${fmt(tot)}</b></div>`;
+ $('lfix').innerHTML=`🏠 今月の固定費　<b>${fmt(sum(t=>cur(t)&&t.type==='out'&&t.x==='固定費'))}</b>`;
+ const cm={};T.filter(t=>cur(t)&&t.type==='out').forEach(t=>cm[t.x]=(cm[t.x]||0)+t.amt);
+ const CT=Object.entries(cm).sort((a,b)=>b[1]-a[1]).slice(0,5),CC=['#35d0a0','#f2a03d','#9b7bd9','#ec5fa6','#8b9ab3'],ctot=exp||1;
+ donut($('lcat'),CT.map(([k,v],i)=>({v,c:CC[i]})),['経費合計',fmt(exp)]);
+ $('lcatl').innerHTML=CT.map(([k,v],i)=>`<div class='lr'><span><i class='dot' style='background:${CC[i]}'></i>${esc(k)}</span><b>${Math.round(v/ctot*100)}%</b></div>`).join('');
+ const best=[...rows].sort((a,b)=>b.p-a.p)[0],topc=CT[0];
+ $('lai').innerHTML=`<div><b>${best?esc(best.n)+'の収益が好調です':'取引を記録するとアドバイスが表示されます'}</b><p>今月の利益は${fmt(prof)}（先月比 ${sg(dl(prof,pprof))}%）です。${best?`事業別では${esc(best.n)}の利益が${fmt(best.p)}で最も大きくなっています。`:''}</p></div><div><b>今月の注目ポイント</b><ul><li>売上は先月比 ${sg(dl(inc,pin))}%</li><li>${unL.length?`未入金が${unL.length}件（${fmt(unS)}）あります`:'未入金はありません'}</li>${topc?`<li>経費で最も大きいのは「${esc(topc[0])}」（${Math.round(topc[1]/ctot*100)}%）</li>`:''}</ul></div><div><b>おすすめのアクション</b><ul><li>未入金の取引の入金確認をする</li><li>今月の経費を月末までに記録する</li><li>事業別の収支を見て、来月の目標を決める</li></ul></div>`}
+TB.querySelector('input[type=date]').value=iso(0);
+TB.querySelector('.tb').innerHTML=Object.entries(TAGS).map(([k,v])=>`<option value='${k}'>${v.n}</option>`).join('');
+const fillX=()=>{TB.querySelector('.xx').innerHTML=TB.querySelector('.ty').value==='in'?Object.entries(ST).map(([k,v])=>`<option value='${k}'>${v[0]}</option>`).join(''):CATS.map(c=>`<option>${c}</option>`).join('')};fillX();
+LVw.addEventListener('change',e=>{if(e.target.classList.contains('ty'))fillX()});
+LVw.addEventListener('keydown',e=>{if(!e.target.closest('#tblank')||e.key!=='Enter'||e.isComposing||e.target.tagName!=='INPUT')return;
+ const t=TB.querySelector('.newt').value.trim(),a=+TB.querySelector('.amt').value;if(!t)return;if(!(a>0)){toast('金額を入力してください');TB.querySelector('.amt').focus();return}
+ ledgerTx.push({id:Date.now(),date:TB.querySelector('input[type=date]').value||iso(0),t,b:TB.querySelector('.tb').value,amt:a,type:TB.querySelector('.ty').value,x:TB.querySelector('.xx').value});put(LK,ledgerTx);
+ TB.querySelector('.newt').value='';TB.querySelector('.amt').value='';ledger();TB.querySelector('.newt').focus()});
+LVw.addEventListener('click',e=>{const g=s=>e.target.closest(s);let x;
+ if(x=g('[data-lp]')){LF.p=x.dataset.lp;ledger()}else if(x=g('[data-lf]')){LF.f=x.dataset.lf;ledger()}
+ else if(x=g('[data-ldel]')){ledgerTx=ledgerTx.filter(t=>t.id!=x.dataset.ldel);put(LK,ledgerTx);ledger()}
+ else if(x=g('[data-cy]')){const t=ledgerTx.find(v=>v.id==x.dataset.cy),k=Object.keys(ST);t.x=k[(k.indexOf(t.x)+1)%3];put(LK,ledgerTx);ledger()}});
+/* ===== ホーム（記録したデータから表示。未入力のところは空・0で表示）===== */
+function renderHome(){const cur=t=>t.date.startsWith(mk),prv=t=>t.date.startsWith(pk),sales=(b,f)=>ledgerTx.filter(t=>f(t)&&t.type==='in'&&t.b===b).reduce((a,t)=>a+t.amt,0);
+ $('kpis').innerHTML=DATA.businesses.map(b=>{const v=sales(b.key,cur),pv=sales(b.key,prv),g=goals[b.key]||0,p=g?Math.round(v/g*100):0,mom=pv?Math.round((v-pv)/pv*100):null;
+  return `<div class="card kpi" style="background:${b.bg};border-color:transparent;color:#1d2b27"><div class="top"><div class="ico" style="background:#fff">${b.icon}</div><div><b class="name">${b.name}</b><small>${b.sub}</small></div></div>
+ <div class="amt">${yen(v)} <small>/ ${g?yen(g):'目標未設定'}</small></div><div class="bar" style="background:#fff9"><i style="width:${Math.min(p,100)}%;background:${b.color}"></i></div>
+ <div class="row"><span class="up">${mom===null?'前月比 —':(mom>=0?'↑ 前月比 +':'↓ 前月比 ')+mom+'%'}</span><span>${g?p+'%':'—'}</span></div></div>`}).join('');
+ $('line').innerHTML=`<text x="220" y="110" text-anchor="middle" font-size="12" fill="var(--sub)">SNS連携後に表示されます</text>`;
+ $('sns').innerHTML=['📷 Instagram','▶️ YouTube','🎵 TikTok'].map(n=>`<div class="stat"><b>—</b><small>${n}</small></div>`).join('');
+ (()=>{const W=440,H=240,L=44,Bt=24,T=8,days=new Date(y,m,0).getDate(),bw=(W-L-8)/days,dt=i=>dd(mk,i+1),dayTot=Array.from({length:days},(_,i)=>DATA.businesses.reduce((a,b)=>a+sales(b.key,t=>t.date===dt(i)),0)),mx=Math.max(100000,Math.ceil(Math.max(...dayTot)/100000)*100000);let h='';
+  for(let i=0;i<=4;i++){const yy=T+(H-T-Bt)*i/4;h+=`<line x1="${L}" x2="${W}" y1="${yy}" y2="${yy}" stroke="var(--line)"/><text x="${L-6}" y="${yy+3}" font-size="9" text-anchor="end" fill="var(--sub)">${(4-i)*mx/4/1000}k</text>`}
+  for(let i=0;i<days;i++){let acc=0;DATA.businesses.forEach(b=>{const v=sales(b.key,t=>t.date===dt(i)),hh=v/mx*(H-T-Bt);if(hh>0){h+=`<rect x="${L+i*bw+1}" y="${H-Bt-acc-hh}" width="${bw-2}" height="${hh}" fill="${b.color}"><title>${b.name}</title></rect>`;acc+=hh}})}
+  for(let i=1;i<=days;i+=7)h+=`<text x="${L+(i-1)*bw+bw/2}" y="${H-6}" font-size="9" fill="var(--sub)" text-anchor="middle">${m}/${i}</text>`;
+  $('bars').innerHTML=h})();
+ $('barlegend').innerHTML=DATA.businesses.map(b=>`<span><i style="background:${b.color}"></i>${b.name}</span>`).join('');
+ const tl=tasks.filter(t=>t.date===iso(0)),dn=tl.filter(t=>t.done).length;
+ $('tasks').innerHTML=tl.map(t=>`<label class="task ${t.done?'done':''}"><input type="checkbox" data-id="${t.id}" ${t.done?'checked':''}><div><div class="t">${esc(t.t)}</div><div class="tm"><span class="tag" style="background:${TAGS[t.b].bg};color:#1d2b27;margin-left:0">${TAGS[t.b].n}</span></div></div></label>`).join('')||`<div class="tm" style="padding:10px 0">今日のタスクはまだありません。「タスク・営業管理」で追加できます。</div>`;
+ $('ptext').textContent=`${dn}/${tl.length} 完了`;$('pbar').style.width=(tl.length?dn/tl.length*100:0)+'%';
+ $('tabs').innerHTML='';$('posts').innerHTML=`<div class="tm" style="padding:10px 0">SNS連携後に投稿の成績が表示されます。</div>`;
+ const tot=DATA.businesses.reduce((a,b)=>a+sales(b.key,cur),0);
+ $('pl').innerHTML=DATA.businesses.map(b=>{const v=sales(b.key,cur);return `<div class="pl"><div class="ico" style="background:${b.bg}">${b.icon}</div><span>${b.name}</span><b>${yen(v)}</b><em>(${tot?Math.round(v/tot*100):0}%)</em></div>`}).join('')+`<div class="total"><span>合計</span><span>${yen(tot)}</span></div>`;
+ $('ai').innerHTML='<li>記録がたまると、ここに提案が表示されます。</li>';
+ $('deals').innerHTML=`<div class="tm" style="padding:10px 0">進行中の案件はまだありません。</div>`}
+$('tasks').addEventListener('change',e=>{const id=e.target.dataset.id;if(id){tasks.find(x=>x.id==id).done=e.target.checked;save();renderHome()}});
+renderGoals();renderHome();
+/* ===== 端末間の同期（claude.ai の db 機能。スマホとPCで同じデータを使う）=====
+   データは自分のアカウント専用の領域（data/users/<自分のID>）に保存。signed-out や非対応の環境ではこの端末だけに保存。
+   競合したときは「最後に更新した端末」が勝つ。 */
+let CUR='home',SYNC=null;const timers={};
+const SYNCK={'tsugumo.tasks.v2':v=>{tasks=v},'tsugumo.memo.v2':v=>{memo=v},'tsugumo.events.v2':v=>{events=v},'tsugumo.ledger.v2':v=>{ledgerTx=v},'tsugumo.goals.v1':v=>{goals=v}};
+const tsOf=k=>+(localStorage.getItem('ts:'+k)||0);
+const rerender=()=>{if(CUR==='home')renderHome();else if(CUR==='task'){renderAll();renderGoals();renderWeek();renderMemo()}else if(CUR==='ledger')ledger()};
+function pushSync(k,v){if(!SYNC||!(k in SYNCK))return;clearTimeout(timers[k]);timers[k]=setTimeout(()=>{SYNC.col.doc(k).set({v:JSON.stringify(v),t:tsOf(k)||Date.now()}).catch(()=>toast('同期に失敗しました（この端末には保存済み）'))},800)}
+async function pullSync(){if(!SYNC)return;let changed=false;
+ for(const k in SYNCK){try{const snap=await SYNC.col.doc(k).get(),r=snap.exists?snap.data():null,lt=tsOf(k);
+  if(r&&r.t>lt){const v=JSON.parse(r.v);SYNCK[k](v);localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('ts:'+k,r.t);changed=true}
+  else if((!r||r.t<lt)&&localStorage.getItem(k)!==null){const t=lt||Date.now();localStorage.setItem('ts:'+k,t);await SYNC.col.doc(k).set({v:localStorage.getItem(k),t})}
+ }catch(e){}}
+ if(changed)rerender()}
+(async()=>{const st=t=>{$('syncst').textContent=t};st('この端末のみ保存');
+ try{if(typeof claude==='undefined'||!claude.use)return;const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);if(!db||!user)return;
+  const uid=await user.id();if(!uid)return;SYNC={col:db.collection('data/users/'+uid)};await pullSync();st('☁ 同期オン');toast('☁ 同期オン')}catch(e){}})();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')pullSync()});
+</script>
+</body>
+</html>
